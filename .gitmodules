@@ -1,0 +1,9 @@
+[submodule "LRDB"]
+	path = LRDB
+	url = https://github.com/danielga/LRDB.git
+[submodule "asio"]
+	path = asio
+	url = https://github.com/chriskohlhoff/asio.git
+[submodule "picojson"]
+	path = picojson
+	url = https://github.com/kazuho/picojson.git
