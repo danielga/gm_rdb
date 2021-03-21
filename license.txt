@@ -1,5 +1,5 @@
-gm_lrdb
-A Garry's Mod module that creates a Lua Remote DeBugger server.
+gm_rdb
+A Garry's Mod module that creates a Remote DeBugger server.
 -----------------------------------------------------------------------
 Copyright (c) 2021, Daniel Almeida
 All rights reserved.

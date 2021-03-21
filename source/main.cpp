@@ -2,12 +2,12 @@
 
 #include <lrdb/server.hpp>
 
-namespace global
+namespace rdb
 {
 	static int32_t metatype = GarrysMod::Lua::Type::None;
 	static const int16_t default_port = 21110;
 
-	LUA_FUNCTION_STATIC( lrdb_activate )
+	LUA_FUNCTION_STATIC( activate )
 	{
 		lrdb::server **server = LUA->GetUserType<lrdb::server *>( lua_upvalueindex( 1 ), metatype );
 		if( *server != nullptr )
@@ -25,7 +25,7 @@ namespace global
 		return 0;
 	}
 
-	LUA_FUNCTION_STATIC( lrdb_deactivate )
+	LUA_FUNCTION_STATIC( deactivate )
 	{
 		lrdb::server **server = LUA->GetUserType<lrdb::server *>( lua_upvalueindex( 1 ), metatype );
 		if( *server != nullptr )
@@ -37,7 +37,7 @@ namespace global
 		return 0;
 	}
 
-	LUA_FUNCTION_STATIC( lrdb_destruct )
+	LUA_FUNCTION_STATIC( destruct )
 	{
 		lrdb::server **server = LUA->GetUserType<lrdb::server *>( 1, metatype );
 		if( *server != nullptr )
@@ -51,9 +51,9 @@ namespace global
 
 	static int32_t Initialize( GarrysMod::Lua::ILuaBase *LUA )
 	{
-		metatype = LUA->CreateMetaTable( "lrdb" );
+		metatype = LUA->CreateMetaTable( "rdb" );
 
-		LUA->PushCFunction( lrdb_destruct );
+		LUA->PushCFunction( destruct );
 		LUA->SetField( -2, "__gc" );
 
 		lrdb::server **server = LUA->NewUserType<lrdb::server *>( metatype );
@@ -65,7 +65,7 @@ namespace global
 
 		LUA->CreateTable( );
 
-		LUA->PushString( "lrdb 1.0.0" );
+		LUA->PushString( "rdb 1.0.0" );
 		LUA->SetField( -2, "Version" );
 
 		// version num follows LuaJIT style, xxyyzz
@@ -73,15 +73,15 @@ namespace global
 		LUA->SetField( -2, "VersionNum" );
 
 		LUA->Push( -2 ); // push userdata to stack stop
-		LUA->PushCClosure( lrdb_activate, 1 );
+		LUA->PushCClosure( activate, 1 );
 		LUA->SetField( -2, "activate" );
 
 		LUA->Push( -2 ); // push userdata to stack stop
-		LUA->PushCClosure( lrdb_deactivate, 1 );
+		LUA->PushCClosure( deactivate, 1 );
 		LUA->SetField( -2, "deactivate" );
 
 		LUA->Push( -1 );
-		LUA->SetField( GarrysMod::Lua::INDEX_GLOBAL, "lrdb" );
+		LUA->SetField( GarrysMod::Lua::INDEX_GLOBAL, "rdb" );
 
 		return 1;
 	}
@@ -89,17 +89,17 @@ namespace global
 	static int32_t Deinitialize( GarrysMod::Lua::ILuaBase *LUA )
 	{
 		LUA->PushNil( );
-		LUA->SetField( GarrysMod::Lua::INDEX_GLOBAL, "lrdb" );
+		LUA->SetField( GarrysMod::Lua::INDEX_GLOBAL, "rdb" );
 		return 0;
 	}
 }
 
 GMOD_MODULE_OPEN( )
 {
-	return global::Initialize( LUA );
+	return rdb::Initialize( LUA );
 }
 
 GMOD_MODULE_CLOSE( )
 {
-	return global::Deinitialize( LUA );
+	return rdb::Deinitialize( LUA );
 }

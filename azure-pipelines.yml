@@ -1,5 +1,5 @@
 variables:
-  MODULE_NAME: lrdb
+  MODULE_NAME: rdb
   DEPENDENCIES: $(System.DefaultWorkingDirectory)/dependencies
   GARRYSMOD_COMMON: $(System.DefaultWorkingDirectory)/dependencies/garrysmod_common
   GARRYSMOD_COMMON_BRANCH: master
