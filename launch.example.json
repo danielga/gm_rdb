@@ -1,21 +1,20 @@
 {
     "configurations": [
         {
-            "type": "lrdb",
+            "type": "gmrdb",
             "request": "attach",
             "name": "Attach to Garry's Mod",
             "stopOnEntry": true,
             // If debugging directly on a Garry's Mod server or client instance, "sourceRoot" pointing to Garry's Mod "garrysmod" directory should be enough
-            "sourceRoot": "${workspaceFolder}",
+            "sourceRoot": "{FULL PATH TO GARRY'S MOD CONTENT DIRECTORY}",
             // Host to connect to, can be localhost (127.0.0.1) or any remote host
             "host": "localhost",
-            // Port to connect to, in case you change it with lrdb.activate(port_number)
-            "port": 21110,
+            // Port to connect to, in case you change it with rdb.activate(port_number)
+            "port": 21111,
             "sourceFileMap": {
                 // This is an example for a remote setup
                 // Local directory -> remote directory (as is announced by debug.getinfo)
-                "${workspaceFolder}": "addons/addon_name_here",
-                "{FULL PATH TO GARRY'S MOD CONTENT DIRECTORY}": "."
+                "${workspaceFolder}": "addons/addon_name_here"
             }
         }
     ]

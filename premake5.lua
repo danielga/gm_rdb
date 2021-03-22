@@ -20,6 +20,10 @@ CreateWorkspace({name = "rdb"})
 			"picojson"
 		})
 		IncludeLuaShared()
+		IncludeHelpersExtended()
+		IncludeSDKCommon()
+		IncludeSDKTier0()
+		IncludeSDKTier1()
 
 	CreateProject({serverside = false})
 		sysincludedirs({
@@ -28,3 +32,7 @@ CreateWorkspace({name = "rdb"})
 			"picojson"
 		})
 		IncludeLuaShared()
+		IncludeHelpersExtended()
+		IncludeSDKCommon()
+		IncludeSDKTier0()
+		IncludeSDKTier1()

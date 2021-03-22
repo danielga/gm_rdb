@@ -1,15 +1,19 @@
 #include <GarrysMod/Lua/Interface.h>
 
-#include <lrdb/server.hpp>
+#include "basic_server.hpp"
+
+#include <lrdb/command_stream/socket.hpp>
 
 namespace rdb
 {
+	typedef basic_server<lrdb::command_stream_socket> lrdb_server;
+
 	static int32_t metatype = GarrysMod::Lua::Type::None;
-	static const int16_t default_port = 21110;
+	static const int16_t default_port = 21111;
 
 	LUA_FUNCTION_STATIC( activate )
 	{
-		lrdb::server **server = LUA->GetUserType<lrdb::server *>( lua_upvalueindex( 1 ), metatype );
+		lrdb_server **server = LUA->GetUserType<lrdb_server *>( lua_upvalueindex( 1 ), metatype );
 		if( *server != nullptr )
 		{
 			delete *server;
@@ -17,9 +21,9 @@ namespace rdb
 		}
 
 		if( LUA->IsType( 1, GarrysMod::Lua::Type::Number ) )
-			*server = new lrdb::server( static_cast<int16_t>( LUA->GetNumber( 1 ) ) );
+			*server = new lrdb_server( static_cast<int16_t>( LUA->GetNumber( 1 ) ) );
 		else
-			*server = new lrdb::server( default_port );
+			*server = new lrdb_server( default_port );
 
 		( *server )->reset( LUA->GetState( ) );
 		return 0;
@@ -27,7 +31,7 @@ namespace rdb
 
 	LUA_FUNCTION_STATIC( deactivate )
 	{
-		lrdb::server **server = LUA->GetUserType<lrdb::server *>( lua_upvalueindex( 1 ), metatype );
+		lrdb_server **server = LUA->GetUserType<lrdb_server *>( lua_upvalueindex( 1 ), metatype );
 		if( *server != nullptr )
 		{
 			delete *server;
@@ -39,7 +43,7 @@ namespace rdb
 
 	LUA_FUNCTION_STATIC( destruct )
 	{
-		lrdb::server **server = LUA->GetUserType<lrdb::server *>( 1, metatype );
+		lrdb_server **server = LUA->GetUserType<lrdb_server *>( 1, metatype );
 		if( *server != nullptr )
 		{
 			delete *server;
@@ -56,7 +60,7 @@ namespace rdb
 		LUA->PushCFunction( destruct );
 		LUA->SetField( -2, "__gc" );
 
-		lrdb::server **server = LUA->NewUserType<lrdb::server *>( metatype );
+		lrdb_server **server = LUA->NewUserType<lrdb_server *>( metatype );
 		*server = nullptr;
 
 		LUA->Push( -2 ); // push metatable to the stack top
