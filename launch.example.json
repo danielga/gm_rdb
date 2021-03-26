@@ -1,16 +1,47 @@
 {
     "configurations": [
         {
+            // Name of the debugger
             "type": "gmrdb",
+            // Type of debug (attach to running program)
             "request": "attach",
+            // Name of the debug configuration
             "name": "Attach to Garry's Mod",
+            // Automatically stop after launch (defaults to true)
             "stopOnEntry": true,
             // If debugging directly on a Garry's Mod server or client instance, "sourceRoot" pointing to Garry's Mod "garrysmod" directory should be enough
             "sourceRoot": "{FULL PATH TO GARRY'S MOD CONTENT DIRECTORY}",
-            // Host to connect to, can be localhost (127.0.0.1) or any remote host
+            // Host to connect to (defaults to localhost), can be localhost (127.0.0.1) or any remote host
             "host": "localhost",
-            // Port to connect to, in case you change it with rdb.activate(port_number)
+            // Port to connect to (defaults to 21111), in case you change it with rdb.activate(port_number)
             "port": 21111,
+            // Mapping of local scripts directories to file paths reported by the debugger (defaults to empty map)
+            "sourceFileMap": {
+                // This is an example for a remote setup
+                // Local directory -> remote directory (as is announced by debug.getinfo)
+                "${workspaceFolder}": "addons/addon_name_here"
+            }
+        },
+        {
+            // Name of the debugger
+            "type": "gmrdb",
+            // Type of debug (launch program)
+            "request": "launch",
+            // Name of the debug configuration
+            "name": "Launch Garry's Mod",
+            // Automatically stop after launch (defaults to true)
+            "stopOnEntry": true,
+            // Full path to the executable to launch
+            "program": "{FULL PATH TO GARRY'S MOD EXECUTABLE}",
+            // Working directory for the program (defaults to program executable directory)
+            "cwd": "{DEFAULTS TO FULL PATH OF GARRY'S MOD EXECUTABLE DIRECTORY}",
+            // Array of arguments to pass to the program
+            "args": [],
+            // If debugging directly on a Garry's Mod server or client instance, "sourceRoot" pointing to Garry's Mod "garrysmod" directory should be enough (defaults to working directory)
+            "sourceRoot": "{DEFAULTS TO WORKING DIRECTORY}",
+            // Port to connect to (defaults to 21111), in case you change it with rdb.activate(port_number)
+            "port": 21111,
+            // Mapping of local scripts directories to file paths reported by the debugger (defaults to empty map)
             "sourceFileMap": {
                 // This is an example for a remote setup
                 // Local directory -> remote directory (as is announced by debug.getinfo)
