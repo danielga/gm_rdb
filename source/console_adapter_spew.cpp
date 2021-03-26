@@ -1,9 +1,16 @@
-#include "console_adapter.hpp"
+#include "console_adapter_spew.hpp"
+
+#if !__has_include(<tier0/logging.h>)
 
 #include <GarrysMod/InterfacePointers.hpp>
 
 #include <cdll_int.h>
 #include <eiface.h>
+
+SpewOutputFunc_t console_adapter::s_original_spew = nullptr;
+std::mutex console_adapter::s_mutex;
+std::condition_variable console_adapter::s_condition;
+std::vector<json::value> console_adapter::s_messages;
 
 console_adapter::console_adapter( ) :
 	m_thread_stop( true )
@@ -28,7 +35,7 @@ console_adapter::~console_adapter( )
 
 void console_adapter::set_callback( const std::function<void( const json::value &message )> &callback )
 {
-	std::unique_lock<std::mutex> lock( m_mutex );
+	std::unique_lock<std::mutex> lock( s_mutex );
 
 	m_callback = callback;
 
@@ -58,7 +65,8 @@ void console_adapter::start( [[maybe_unused]] std::unique_lock<std::mutex> &lock
 	if( !m_thread_stop )
 		return;
 
-	LoggingSystem_RegisterLoggingListener( this );
+	s_original_spew = GetSpewOutputFunc( );
+	SpewOutputFunc( &console_adapter::Log );
 
 	m_thread_stop = false;
 	m_thread = std::thread( &console_adapter::queue_dispatcher, this );
@@ -69,13 +77,14 @@ void console_adapter::stop( std::unique_lock<std::mutex> &lock )
 	if( m_thread_stop )
 		return;
 
-	LoggingSystem_UnregisterLoggingListener( this );
+	SpewOutputFunc( s_original_spew );
+	s_original_spew = nullptr;
 
-	m_messages.clear( );
+	s_messages.clear( );
 
 	m_thread_stop = true;
 	lock.unlock( );
-	m_condition.notify_all( );
+	s_condition.notify_all( );
 	m_thread.join( );
 }
 
@@ -85,12 +94,12 @@ void console_adapter::queue_dispatcher( )
 	{
 		std::vector<json::value> messages;
 		{
-			std::unique_lock<std::mutex> lock( m_mutex );
-			m_condition.wait( lock, [this] { return !m_messages.empty( ) || m_thread_stop; } );
+			std::unique_lock<std::mutex> lock( s_mutex );
+			s_condition.wait( lock, [this] { return !s_messages.empty( ) || m_thread_stop; } );
 			if( m_thread_stop )
 				break;
 
-			std::swap( messages, m_messages );
+			std::swap( messages, s_messages );
 		}
 
 		for( const json::value &message : messages )
@@ -98,15 +107,11 @@ void console_adapter::queue_dispatcher( )
 	}
 }
 
-void console_adapter::Log( const LoggingContext_t *pContext, const tchar *pMessage )
+SpewRetval_t console_adapter::Log( SpewType_t spewType, const tchar *pMsg )
 {
-	std::unique_lock<std::mutex> lock( m_mutex );
-	if( !m_callback || ( pContext->m_Flags & LCF_DO_NOT_ECHO ) )
-		return;
+	std::unique_lock<std::mutex> lock( s_mutex );
 
-	Color color = pContext->m_Color;
-	if( color == UNSPECIFIED_LOGGING_COLOR )
-		color = Color( 255, 255, 255, 255 );
+	const Color &color = *GetSpewOutputColor( );
 
 	json::object jcolor;
 	jcolor["r"] = json::value( static_cast<double>( color.r( ) ) );
@@ -115,13 +120,17 @@ void console_adapter::Log( const LoggingContext_t *pContext, const tchar *pMessa
 	jcolor["a"] = json::value( static_cast<double>( color.a( ) ) );
 
 	json::object param;
-	param["channel_id"] = json::value( static_cast<double>( pContext->m_ChannelID ) );
-	param["severity"] = json::value( static_cast<double>( pContext->m_Severity ) );
+	param["group"] = json::value( GetSpewOutputGroup( ) );
+	param["severity"] = json::value( static_cast<double>( GetSpewOutputLevel( ) ) );
 	param["color"] = json::value( jcolor );
-	param["message"] = json::value( pMessage );
+	param["message"] = json::value( pMsg );
 
-	m_messages.emplace_back( std::move( param ) );
+	s_messages.emplace_back( std::move( param ) );
 
 	lock.unlock( );
-	m_condition.notify_all( );
+	s_condition.notify_all( );
+
+	return s_original_spew( spewType, pMsg );
 }
+
+#endif

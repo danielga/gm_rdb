@@ -13,7 +13,8 @@
 
 #include <picojson.h>
 
-#include "console_adapter.hpp"
+#include "console_adapter_logging.hpp"
+#include "console_adapter_spew.hpp"
 
 #define LRDB_SERVER_PROTOCOL_VERSION "gmod-1"
 

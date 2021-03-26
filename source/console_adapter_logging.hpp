@@ -1,5 +1,7 @@
 #pragma once
 
+#if __has_include(<tier0/logging.h>)
+
 #include <mutex>
 #include <thread>
 #include <atomic>
@@ -36,10 +38,10 @@ public:
 
 	void set_callback( const std::function<void( const json::value &message )> &callback );
 
-	void run_command( [[maybe_unused]] const std::string &command );
+	void run_command( const std::string &command );
 
 private:
-	void start( [[maybe_unused]] std::unique_lock<std::mutex> &lock );
+	void start( std::unique_lock<std::mutex> &lock );
 
 	void stop( std::unique_lock<std::mutex> &lock );
 
@@ -65,3 +67,5 @@ private:
 #endif
 
 };
+
+#endif

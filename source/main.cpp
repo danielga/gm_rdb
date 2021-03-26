@@ -69,11 +69,11 @@ namespace rdb
 
 		LUA->CreateTable( );
 
-		LUA->PushString( "rdb 1.0.0" );
+		LUA->PushString( "rdb 1.1.0" );
 		LUA->SetField( -2, "Version" );
 
 		// version num follows LuaJIT style, xxyyzz
-		LUA->PushNumber( 10000 );
+		LUA->PushNumber( 10100 );
 		LUA->SetField( -2, "VersionNum" );
 
 		LUA->Push( -2 ); // push userdata to stack stop
